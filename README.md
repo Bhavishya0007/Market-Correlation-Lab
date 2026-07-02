@@ -64,4 +64,3 @@ session code is generic.
   are cached for 24h and news for 15 minutes to stay under it.
 - India-specific macro (RBI repo rate, India CPI) isn't on Alpha Vantage;
   a natural extension is adding a small CSV loader for RBI/MOSPI data.
-# Market-Correlation-Lab
