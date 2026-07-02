@@ -5,6 +5,10 @@ built around the US-vs-India (developed-vs-emerging) question — through the
 lens of asset allocation, interest rates, inflation, and risk aversion.
 Market news is pulled through the **Alpha Vantage MCP server**.
 
+## Screenshot
+
+![Application Screenshot](images/screenshot1.png)
+
 ## Quick start
 
 ```bash
