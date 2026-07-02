@@ -122,6 +122,23 @@ def load_risk_series(start: date, end: date) -> pd.DataFrame:
 # Macro series from Alpha Vantage (needs a free API key)
 # ---------------------------------------------------------------------------
 
+def parse_av_series(payload: dict) -> pd.Series | None:
+    """Pure parser for an Alpha Vantage economic-series payload.
+
+    Returns a date-indexed Series, or None if the payload carries no data.
+    Skips rows with missing/placeholder values ('.', '', None).
+    """
+    rows = payload.get("data", [])
+    if not rows:
+        return None
+    s = pd.Series(
+        {pd.Timestamp(r["date"]): float(r["value"])
+         for r in rows if r.get("value") not in (None, ".", "")},
+        name=payload.get("name", "series"),
+    ).sort_index()
+    return s if len(s) else None
+
+
 @st.cache_data(ttl=24 * 60 * 60, show_spinner=False)
 def load_av_macro(function: str, extra: dict | None = None) -> pd.Series | None:
     """Fetch one Alpha Vantage economic series (e.g. CPI, FEDERAL_FUNDS_RATE,
@@ -135,19 +152,9 @@ def load_av_macro(function: str, extra: dict | None = None) -> pd.Series | None:
         params.update(extra)
     try:
         resp = requests.get(ALPHAVANTAGE_BASE, params=params, timeout=30)
-        payload = resp.json()
-        rows = payload.get("data", [])
-        if not rows:
-            return None
-        s = pd.Series(
-            {pd.Timestamp(r["date"]): float(r["value"])
-             for r in rows if r.get("value") not in (None, ".", "")},
-            name=payload.get("name", function),
-        ).sort_index()
-        return s
+        return parse_av_series(resp.json())
     except Exception:
         return None
-
 
 def load_macro_bundle() -> dict[str, pd.Series]:
     """The macro overlays used by the 'Macro & Risk Lens' tab."""

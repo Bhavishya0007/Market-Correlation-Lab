@@ -88,6 +88,23 @@ def _fetch_via_rest(key: str, tickers: str, topics: str, limit: int) -> dict:
     resp.raise_for_status()
     return resp.json()
 
+def feed_to_df(feed: list[dict]) -> pd.DataFrame:
+    """Pure converter: Alpha Vantage NEWS_SENTIMENT feed items -> DataFrame,
+    newest first. Malformed timestamps/scores become NaT/NaN, not errors."""
+    rows = []
+    for item in feed:
+        rows.append({
+            "Published": pd.to_datetime(item.get("time_published"),
+                                        format="%Y%m%dT%H%M%S", errors="coerce"),
+            "Title": item.get("title", ""),
+            "Source": item.get("source", ""),
+            "Sentiment": item.get("overall_sentiment_label", ""),
+            "Score": pd.to_numeric(item.get("overall_sentiment_score"),
+                                   errors="coerce"),
+            "URL": item.get("url", ""),
+            "Summary": item.get("summary", ""),
+        })
+    return pd.DataFrame(rows).sort_values("Published", ascending=False)
 
 @st.cache_data(ttl=15 * 60, show_spinner=False)
 def fetch_news(tickers: str = "", topics: str = "financial_markets",
@@ -129,18 +146,5 @@ def fetch_news(tickers: str = "", topics: str = "financial_markets",
             f"{list(payload.keys()) or 'none'}. Try removing ticker filters "
             f"or a broader topic.")
 
-    rows = []
-    for item in feed:
-        rows.append({
-            "Published": pd.to_datetime(item.get("time_published"),
-                                        format="%Y%m%dT%H%M%S", errors="coerce"),
-            "Title": item.get("title", ""),
-            "Source": item.get("source", ""),
-            "Sentiment": item.get("overall_sentiment_label", ""),
-            "Score": pd.to_numeric(item.get("overall_sentiment_score"),
-                                   errors="coerce"),
-            "URL": item.get("url", ""),
-            "Summary": item.get("summary", ""),
-        })
-    df = pd.DataFrame(rows).sort_values("Published", ascending=False)
-    return df, source
+    rows = feed_to_df(feed)
+    return rows, source

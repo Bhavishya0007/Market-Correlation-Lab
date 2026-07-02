@@ -1,5 +1,7 @@
 # Global Market Correlation Lab
 
+![tests](https://github.com/Bhavishya0007/Market-Correlation-Lab/actions/workflows/tests.yml/badge.svg)
+
 A Streamlit app for studying how correlated global equity markets are —
 built around the US-vs-India (developed-vs-emerging) question — through the
 lens of asset allocation, interest rates, inflation, and risk aversion.
@@ -14,7 +16,7 @@ Market news is pulled through the **Alpha Vantage MCP server**.
 ```bash
 pip install -r requirements.txt
 export ALPHAVANTAGE_API_KEY=your_free_key   # https://www.alphavantage.co/support/#api-key
-streamlit run app.py
+streamlit run src/app.py
 ```
 
 The app works without a key too — you just lose the macro overlays and the
@@ -23,18 +25,33 @@ news tab (price history comes from Yahoo Finance and needs no key).
 ## Architecture
 
 ```
-app.py           Streamlit UI: 4 tabs, all parameters in the sidebar
-data_sources.py  Prices (yfinance), FX conversion to USD, VIX/10Y,
-                 Alpha Vantage macro series (Fed funds, CPI, yields)
-analysis.py      Log returns, correlation matrix, rolling corr & beta,
-                 era comparison, VIX-regime-conditioned correlation
-mcp_news.py      MCP client -> https://mcp.alphavantage.co (NEWS_SENTIMENT
-                 tool), with a REST fallback if MCP is unavailable
+src/
+  app.py           Streamlit UI: 4 tabs, all parameters in the sidebar
+  data_sources.py  Prices (yfinance), FX conversion to USD, VIX/10Y,
+                   Alpha Vantage macro series (Fed funds, CPI, yields)
+  analysis.py      Log returns, correlation matrix, rolling corr & beta,
+                   era comparison, VIX-regime-conditioned correlation
+  mcp_news.py      MCP client -> https://mcp.alphavantage.co (NEWS_SENTIMENT
+                   tool), with a REST fallback if MCP is unavailable
+tst/
+  conftest.py      Adds src/ to sys.path; stubs streamlit/yfinance for slim CI
+  test_*.py        28 offline tests: statistical recovery on synthetic data,
+                   FX conversion, payload parsing, failure paths
 ```
 
 To swap in a different financial institution's MCP server, change
-`MCP_SERVER_URL` and the tool name/arguments in `mcp_news.py` — the client
-session code is generic.
+`MCP_SERVER_URL` and the tool name/arguments in `src/mcp_news.py` — the
+client session code is generic.
+
+## Running tests
+
+```bash
+pip install -r requirements-dev.txt
+pytest
+```
+
+Tests run offline — no API key or network needed. CI runs them on every
+push via `.github/workflows/tests.yml`.
 
 ## Methodology notes (why the defaults are what they are)
 

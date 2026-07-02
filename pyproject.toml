@@ -1,0 +1,8 @@
+[project]
+name = "market-correlation-lab"
+version = "0.1.0"
+description = "Streamlit app analyzing correlation regimes across global equity markets with macro overlays and MCP-powered news"
+requires-python = ">=3.10"
+
+[tool.pytest.ini_options]
+testpaths = ["tst"]
