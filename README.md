@@ -7,7 +7,7 @@ Market news is pulled through the **Alpha Vantage MCP server**.
 
 ## Screenshot
 
-![Application Screenshot](images/screenshot1.png)
+![Application Screenshot](images/screenshot2.png)
 
 ## Quick start
 
