@@ -7,6 +7,14 @@ built around the US-vs-India (developed-vs-emerging) question — through the
 lens of asset allocation, interest rates, inflation, and risk aversion.
 Market news is pulled through the **Alpha Vantage MCP server**.
 
+## Live Demo
+
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](
+https://market-correlation-lab-dfftyvyiwfc7ijzexyxhzq.streamlit.app/
+)
+
+👉 Open the app: https://market-correlation-lab-dfftyvyiwfc7ijzexyxhzq.streamlit.app/
+
 ## Screenshot
 
 ![Application Screenshot](images/screenshot2.png)
